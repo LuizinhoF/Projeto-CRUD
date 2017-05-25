@@ -36,5 +36,10 @@ namespace Persistence.DAL.Registers
             context.SaveChanges();
             return product;
         }
+
+        public IQueryable<Product> GetByCategory(long? categoryId)
+        {
+            return context.Products.Where(p => p.CategoryID.HasValue && p.CategoryID.Value == categoryId);
+        }
     }
 }

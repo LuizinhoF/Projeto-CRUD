@@ -19,6 +19,10 @@ namespace Services.Registers
         {
             return productDAL.GetOrderById(id);
         }
+        public IQueryable<Product> GetByCategory(long? id)
+        {
+            return productDAL.GetByCategory(id);
+        }
         public void Save(Product product)
         {
             productDAL.SaveProduct(product);

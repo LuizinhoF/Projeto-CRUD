@@ -1,6 +1,11 @@
-﻿using Model.Tables;
+﻿using LuizDubena.Model;
+using Model.Tables;
+using Services.Registers;
 using Services.Tables;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace LuizDubena.Controllers.API
@@ -8,17 +13,54 @@ namespace LuizDubena.Controllers.API
     public class CategoriesController : ApiController
     {
         private CategoryService service = new CategoryService();
+        private ProductService productService = new ProductService();
 
         // GET: api/Categories
-        public IEnumerable<Category> Get()
+        public CategoryListAPIModel Get()
+        {
+            var apiModel = new CategoryListAPIModel();
+
+            try
+            {
+                apiModel.Result = service.GetByName();
+            }
+            catch (System.Exception)
+            {
+                apiModel.Message = "!OK";
+            }
+
+            return apiModel;
+        }
+        /*public IEnumerable<Category> Get()
         {
             return service.GetByName();
-        }
+        }*/
 
         // GET: api/Categories/5
-        public Category Get(int id)
+        public CategoryAPIModel Get(long? id)
         {
-            return service.GetByID(id);
+            var apiModel = new CategoryAPIModel();
+
+            try
+            {
+                if (id == null)
+                {
+                    apiModel.Message = "!OK";
+                    return apiModel;
+                }
+                else
+                {
+                    apiModel.Result = service.GetByID(id);
+                    if (apiModel.Result != null)
+                        apiModel.Result.Products = productService.GetByCategory(id.Value).ToList();
+                }
+            }
+            catch (System.Exception)
+            {
+                apiModel.Message = "!OK";
+            }
+
+            return apiModel;
         }
 
         // POST: api/Categories

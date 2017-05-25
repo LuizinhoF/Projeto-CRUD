@@ -9,11 +9,17 @@ namespace Persistence.DAL.Tables
     public class CategoryDAL
     {
         private EFContext context = new EFContext();
+
+
         public IQueryable<Category>GetOrderbyName()
         {
             return context.Categories.OrderBy(c => c.Name);
-        }
-        public Category GetOrderById(long id)
+        }        public IQueryable<Category> Get()
+        {
+            return context.Categories;
+        }
+
+        public Category GetOrderById(long? id)
         {
             return context.Categories.Where(c => c.CategoryID == id).First(); //.Include("Products.Supplier").First();
         }

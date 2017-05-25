@@ -1,4 +1,5 @@
-﻿using Model.Tables;
+﻿using LuizDubena.Model;
+using Model.Tables;
 using Newtonsoft.Json;
 using Services.Tables;
 using System;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Mvc;
 
 namespace LuizDubena.Controllers
@@ -23,17 +25,17 @@ namespace LuizDubena.Controllers
         #region [ Index ]
         public async Task<ActionResult> Index()
         {
-            List<Category> list = new List<Category>();
+            var apiModel = new CategoryListAPIModel();
 
-            var resp = await FromAPI(null, response =>
+            var resp = await GetFromAPI(null, response =>
             {
                 if (response.IsSuccessStatusCode)
                 {
                     var result = response.Content.ReadAsStringAsync().Result;
-                    list = JsonConvert.DeserializeObject<List<Category>>(result);
+                    apiModel = JsonConvert.DeserializeObject<CategoryListAPIModel>(result);
                 }
             });
-            return View(list);
+            return View(apiModel.Result);
         }
 
         #endregion
@@ -99,9 +101,9 @@ namespace LuizDubena.Controllers
 
         #region [ Details ]
 
-        public ActionResult Details(long? id)
+        public async Task<ActionResult> Details(long? id)
         {
-            return ByID(id);
+            return await GetViewByID(id);
         }
 
         #endregion
@@ -110,7 +112,7 @@ namespace LuizDubena.Controllers
 
         #region [ Methods ]
 
-        private async Task<HttpResponseMessage> FromAPI(long? id, Action<HttpResponseMessage> action)
+        private async Task<HttpResponseMessage> GetFromAPI(long? id, Action<HttpResponseMessage> action)
         {
             using (var client = new HttpClient())
             {
@@ -136,24 +138,24 @@ namespace LuizDubena.Controllers
             if (id == null)
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 
-            Category item = null;
+            CategoryAPIModel item = null;
 
-            var resp = await FromAPI(id.Value, response =>
+            var resp = await GetFromAPI(id.Value, response =>
             {
                 if (response.IsSuccessStatusCode)
                 {
                     var result = response.Content.ReadAsStringAsync().Result;
-                    item = JsonConvert.DeserializeObject<Category>(result);
+                    item = JsonConvert.DeserializeObject<CategoryAPIModel>(result);
                 }
             });
 
             if (!resp.IsSuccessStatusCode)
                 return new HttpStatusCodeResult(resp.StatusCode);
 
-            if (item == null)
+            if (item.Message == "!OK" || item.Result == null)
                 return HttpNotFound();
 
-            return View(item);
+            return View(item.Result);
         }        private ActionResult ByID(long? id)
         {
             if (id == null)
