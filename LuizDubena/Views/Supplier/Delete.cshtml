@@ -1,0 +1,58 @@
+﻿@model Model.Registers.Supplier
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Suppliers Delete";
+}
+
+<div class="panel	panel-primary">				
+    <div class="panel-heading">								
+    Supplier Data				
+    </div>				
+    <div class="panel-body">								
+        <div class="form-group">												
+            @Html.LabelFor(model => model.Name)
+        <br />												
+            <div class="input-group">																
+                <span class="input-group-addon">																				
+                <i class="glyphicon	glyphicon-user"></i>																
+                </span>																
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })												
+            </div>								
+        </div>				
+    </div>				
+    <div class="panel-footer	panel-info">
+        <a href="#" class="btn	btn-info" data-toggle="modal" data-target="#deleteConfirmationModal">Remove</a>
+        @Html.ActionLink("Return to Index", "Index", null, new { @class = "btn	btn-info" })
+    </div>
+</div>
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ELTEismiss="modal" aria-hidden="true">	&times;	</button>
+                <h4 class="modal-title"> Supplier Delete Confirmation </h4>
+            </div>
+            <div class="modal-body">
+                <p>	You are about to remove the Supplier @Model.Name.ToUpper() . </p>
+                <p>
+                    <strong>
+                        Are you sure you want to proced?
+                    </strong>
+                </p>
+                @using (Html.BeginForm("Delete", "Supplier", FormMethod.Post, new { @id = "delete-form", role = "form" }))
+                {
+                    @Html.HiddenFor(m => m.SupplierID)
+                    @Html.AntiForgeryToken()
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn	btn-default" onclick="$('#delete-form').submit();">	Yes, delete it.	</button>
+                <button type="button" class="btn	btn-primary" data-dismiss="modal"> No, don't delete it.	</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("~/Views/Products/_ForSupplier.cshtml", Model.Products.ToList())
+
