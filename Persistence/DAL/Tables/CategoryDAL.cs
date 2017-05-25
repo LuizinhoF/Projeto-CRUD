@@ -1,4 +1,5 @@
-﻿using Model.Tables;
+﻿
+using Model.Tables;
 using Persistence.Contexts;
 using System.Data.Entity;
 using System.Linq;
@@ -31,6 +32,7 @@ namespace Persistence.DAL.Tables
         public Category DeleteByID(long id)
         {
             Category category = GetOrderById(id);
+            context.Products.RemoveRange(context.Products).Where(m => m.CategoryID == id);
             context.Categories.Remove(category);
             context.SaveChanges();
             return category;

@@ -32,6 +32,7 @@ namespace Persistence.DAL.Registers
         public Supplier DeleteByID(long id)
         {
             Supplier supplier = GetOrderById(id);
+            context.Products.RemoveRange(context.Products).Where(m => m.ProductId == id);
             context.Suppliers.Remove(supplier);
             context.SaveChanges();
             return supplier;
