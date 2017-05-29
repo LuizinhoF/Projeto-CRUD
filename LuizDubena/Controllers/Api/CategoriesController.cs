@@ -16,9 +16,9 @@ namespace LuizDubena.Controllers.API
         private ProductService productService = new ProductService();
 
         // GET: api/Categories
-        public CategoryListAPIModel Get()
+        public CategoryListModel Get()
         {
-            var apiModel = new CategoryListAPIModel();
+            var apiModel = new CategoryListModel();
 
             try
             {

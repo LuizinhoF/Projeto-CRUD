@@ -20,7 +20,7 @@ namespace LuizDubena.Model
         }
     }
 
-    public class CategoryListAPIModel : APIModel
+    public class CategoryListModel : APIModel
     {
         public List<Category> Result
         { get; set; }

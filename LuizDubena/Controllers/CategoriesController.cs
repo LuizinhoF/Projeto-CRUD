@@ -25,14 +25,14 @@ namespace LuizDubena.Controllers
         #region [ Index ]
         public async Task<ActionResult> Index()
         {
-            var apiModel = new CategoryListAPIModel();
+            var apiModel = new CategoryListModel();
 
             var resp = await GetFromAPI(null, response =>
             {
                 if (response.IsSuccessStatusCode)
                 {
                     var result = response.Content.ReadAsStringAsync().Result;
-                    apiModel = JsonConvert.DeserializeObject<CategoryListAPIModel>(result);
+                    apiModel = JsonConvert.DeserializeObject<CategoryListModel>(result);
                 }
             });
             return View(apiModel.Result);
@@ -53,15 +53,18 @@ namespace LuizDubena.Controllers
           
         public async Task<ActionResult> Create(Category category)
         {
-            var apiModel = new CategoryAPIModel(category);
-            return GetFromAPI(category.CategoryID, response =>
+            var apiModel = new CategoryAPIModel();
+
+            var resp = await PostFromAPI( response =>
             {
                 if (response.IsSuccessStatusCode)
                 {
                     var result = response.Content.ReadAsStringAsync().Result;
                     apiModel = JsonConvert.DeserializeObject<CategoryAPIModel>(result);
                 }
-            });
+            }, category);
+
+            return RedirectToAction("Index");
         }
         /*
         public ActionResult Create(Category category)
@@ -147,6 +150,25 @@ namespace LuizDubena.Controllers
             }
         }
 
+        private async Task<HttpResponseMessage>PostFromAPI( Action<HttpResponseMessage> action,Category category)
+        {
+            using (var client = new HttpClient())
+            {
+                var baseUrl = string.Format("{0}://{1}", HttpContext.Request.Url.Scheme, HttpContext.Request.Url.Authority);
+                client.BaseAddress = new Uri(baseUrl);
+                client.DefaultRequestHeaders.Clear();
+
+                var url = "Api/Categories";
+
+                var request = await client.PostAsJsonAsync(url, category);
+
+                if (action != null)
+                    action.Invoke(request);
+
+                return request;
+            }
+        }
+
         private async Task<ActionResult> GetViewByID(long? id)
         {
             if (id == null)
@@ -170,7 +192,26 @@ namespace LuizDubena.Controllers
                 return HttpNotFound();
 
             return View(item.Result);
-        }        private ActionResult ByID(long? id)
+        } /*   private async Task<ActionResult> SaveCategory (Category category)
+        {
+            CategoryAPIModel item = null;
+
+            using (var client = new HttpClient())
+            {
+                var baseUrl = string.Format("{0}://{1}", HttpContext.Request.Url.Scheme, HttpContext.Request.Url.Authority);
+                client.BaseAddress = new Uri(baseUrl);
+                client.DefaultRequestHeaders.Clear();
+
+                var url = "Api/Categories";
+
+                var request = await client.GetAsync(url);
+
+                    action.Invoke(request);
+
+                return request;
+            }
+
+        }*/        private ActionResult ByID(long? id)
         {
             if (id == null)
             {
@@ -182,7 +223,7 @@ namespace LuizDubena.Controllers
                 return HttpNotFound();
             }
             return View(category);
-        }        private ActionResult SaveCategory(Category category)
+        }      private ActionResult SaveCategory(Category category)
         {
             try
             {
