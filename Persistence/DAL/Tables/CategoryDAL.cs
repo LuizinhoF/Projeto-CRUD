@@ -21,7 +21,8 @@ namespace Persistence.DAL.Tables
 
         public Category GetOrderById(long? id)
         {
-            return context.Categories.Where(c => c.CategoryID == id).First(); //.Include("Products.Supplier").First();
+            return context.Categories.Where(c => c.CategoryID == id).First();
+            //Include("Products.Supplier")
         }
         public void SaveProduct(Category category)
         {

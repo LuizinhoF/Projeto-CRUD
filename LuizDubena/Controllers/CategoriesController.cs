@@ -38,6 +38,7 @@ namespace LuizDubena.Controllers
             return View(apiModel.Result);
         }
 
+
         #endregion
 
         #region [ CREATE ]
@@ -49,19 +50,32 @@ namespace LuizDubena.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-
+          
+        public async Task<ActionResult> Create(Category category)
+        {
+            var apiModel = new CategoryAPIModel(category);
+            return GetFromAPI(category.CategoryID, response =>
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = response.Content.ReadAsStringAsync().Result;
+                    apiModel = JsonConvert.DeserializeObject<CategoryAPIModel>(result);
+                }
+            });
+        }
+        /*
         public ActionResult Create(Category category)
         {
             return SaveCategory(category);
         }
-
+        */
         #endregion
 
         #region [ Edit ]
 
-        public ActionResult Edit(long? id)
+        public async Task<ActionResult> Edit(long? id)
         {
-            return ByID(id);
+            return await GetViewByID(id);
         }
 
         [HttpPost]
@@ -75,9 +89,9 @@ namespace LuizDubena.Controllers
 
         #region [ Delete ]
 
-        public ActionResult Delete(long id)
+        public async Task<ActionResult> Delete(long? id)
         {
-            return ByID(id);
+            return await GetViewByID(id);
         }
 
         [HttpPost, ActionName ("Delete")]

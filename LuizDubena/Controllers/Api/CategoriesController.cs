@@ -22,7 +22,7 @@ namespace LuizDubena.Controllers.API
 
             try
             {
-                apiModel.Result = service.GetByName();
+                apiModel.Result = service.Get().ToList();
             }
             catch (System.Exception)
             {
@@ -31,10 +31,6 @@ namespace LuizDubena.Controllers.API
 
             return apiModel;
         }
-        /*public IEnumerable<Category> Get()
-        {
-            return service.GetByName();
-        }*/
 
         // GET: api/Categories/5
         public CategoryAPIModel Get(long? id)
@@ -50,7 +46,7 @@ namespace LuizDubena.Controllers.API
                 }
                 else
                 {
-                    apiModel.Result = service.GetByID(id);
+                    apiModel.Result = service.GetByID(id.Value);
                     if (apiModel.Result != null)
                         apiModel.Result.Products = productService.GetByCategory(id.Value).ToList();
                 }

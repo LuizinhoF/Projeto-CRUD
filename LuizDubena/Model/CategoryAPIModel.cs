@@ -9,10 +9,20 @@ namespace LuizDubena.Model
     public class CategoryAPIModel : APIModel
     {
         public Category Result { get; set; }
+
+        public CategoryAPIModel()
+        {
+        }
+
+        public CategoryAPIModel(Category category)
+        {
+            Result = category;
+        }
     }
 
     public class CategoryListAPIModel : APIModel
     {
-        public IQueryable<Category> Result { get; set; }
+        public List<Category> Result
+        { get; set; }
     }
 }

@@ -18,7 +18,7 @@ namespace Services.Tables
             return categoryDAL.GetOrderById(id);
         }
 
-        public IQueryable<Category> Get(long? id)
+        public IQueryable<Category> Get()
         {
             return categoryDAL.Get();
         }

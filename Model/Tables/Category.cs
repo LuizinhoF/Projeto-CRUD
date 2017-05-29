@@ -9,7 +9,8 @@ namespace Model.Tables
     {
         public long? CategoryID { get; set; }
         public string Name { get; set; }
-        [NotMapped]
+       [NotMapped]
         public virtual ICollection<Product> Products { get; set; }
+
     }
 }
