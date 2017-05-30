@@ -66,7 +66,7 @@ namespace LuizDubena.Controllers.API
         }
 
         // PUT: api/Categories/5
-        public void Put(int id, [FromBody]Category value)
+        public void Put(long id, [FromBody]Category value)
         {
             service.Save(value);
         }

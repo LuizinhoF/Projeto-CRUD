@@ -55,7 +55,7 @@ namespace LuizDubena.Controllers
         {
             var apiModel = new CategoryAPIModel();
 
-            var resp = await PostFromAPI( response =>
+            var resp = await PostFromAPI( null, response =>
             {
                 if (response.IsSuccessStatusCode)
                 {
@@ -83,9 +83,20 @@ namespace LuizDubena.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Category category)
+        public async Task<ActionResult> Edit(Category category)
         {
-            return SaveCategory(category);
+            var apiModel = new CategoryAPIModel();
+
+            var resp = await PostFromAPI(5, response =>
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = response.Content.ReadAsStringAsync().Result;
+                    apiModel = JsonConvert.DeserializeObject<CategoryAPIModel>(result);
+                }
+            }, category);
+
+            return RedirectToAction("Index");
         }
 
         #endregion
@@ -99,12 +110,22 @@ namespace LuizDubena.Controllers
 
         [HttpPost, ActionName ("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(long id)
+        public async Task<ActionResult> DeleteConfirmed(long id)
         {
             try
             {
-                Category category = categoryService.DeleteByID(id);
-                TempData["Message"] = "Category " + category.Name.ToUpper() + "	was removed";
+                var apiModel = new CategoryAPIModel();
+
+                var resp = await DeleteFromAPI(id, response =>
+                {
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var result = response.Content.ReadAsStringAsync().Result;
+                        apiModel = JsonConvert.DeserializeObject<CategoryAPIModel>(result);
+                    }
+                });
+
+             // TempData["Message"] = "Category " + category.Name.ToUpper() + "	was removed";
                 return RedirectToAction("Index");
             }
             catch
@@ -150,7 +171,7 @@ namespace LuizDubena.Controllers
             }
         }
 
-        private async Task<HttpResponseMessage>PostFromAPI( Action<HttpResponseMessage> action,Category category)
+        private async Task<HttpResponseMessage>PostFromAPI(long? id,Action<HttpResponseMessage> action, Category category)
         {
             using (var client = new HttpClient())
             {
@@ -160,7 +181,27 @@ namespace LuizDubena.Controllers
 
                 var url = "Api/Categories";
 
+                if (id != null)
+                    url = "Api/Categories/" + id;
+
                 var request = await client.PostAsJsonAsync(url, category);
+                await client.DeleteAsync(url);
+                if (action != null)
+                    action.Invoke(request);
+
+                return request;
+            }
+        }
+
+        private async Task<HttpResponseMessage>DeleteFromAPI(long id, Action<HttpResponseMessage> action)
+        {
+            using (var client = new HttpClient())
+            {
+                var baseUrl = string.Format("{0}://{1}", HttpContext.Request.Url.Scheme, HttpContext.Request.Url.Authority);
+                client.BaseAddress = new Uri(baseUrl);
+                client.DefaultRequestHeaders.Clear();
+               var url = "Api/Categories/" + id;
+                var request = await client.DeleteAsync(url);
 
                 if (action != null)
                     action.Invoke(request);
@@ -192,26 +233,7 @@ namespace LuizDubena.Controllers
                 return HttpNotFound();
 
             return View(item.Result);
-        } /*   private async Task<ActionResult> SaveCategory (Category category)
-        {
-            CategoryAPIModel item = null;
-
-            using (var client = new HttpClient())
-            {
-                var baseUrl = string.Format("{0}://{1}", HttpContext.Request.Url.Scheme, HttpContext.Request.Url.Authority);
-                client.BaseAddress = new Uri(baseUrl);
-                client.DefaultRequestHeaders.Clear();
-
-                var url = "Api/Categories";
-
-                var request = await client.GetAsync(url);
-
-                    action.Invoke(request);
-
-                return request;
-            }
-
-        }*/        private ActionResult ByID(long? id)
+        }        private ActionResult ByID(long? id)
         {
             if (id == null)
             {
